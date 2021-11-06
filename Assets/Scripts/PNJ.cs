@@ -43,7 +43,7 @@ public class PNJ : InterestPoint
             //try to reach them or go away from them !
             foreach (Influenceur infl in influenceurAutour)
             {
-                if (infl.attractivenessForPNJ < 0)
+                if (infl.attractivenessForPNJ == 0)
                     continue;
                 Vector2 directionToHim = infl.transform.position - this.transform.position;
                 float distDist = directionToHim.sqrMagnitude;
@@ -61,7 +61,7 @@ public class PNJ : InterestPoint
                 if (valRepuls01 > 0 && valRepuls01 < 1)
                 {
                     Debug.DrawRay(this.transform.position, directionToHim * valRepuls01, Color.black);
-                    Debug.Log("ValRepuls :" + valRepuls01);
+                    //Debug.Log("ValRepuls :" + valRepuls01);
                     direction = Vector2.Lerp(direction, -directionToHim, valRepuls01);
                 }
                 else

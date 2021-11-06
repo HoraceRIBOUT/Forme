@@ -1058,11 +1058,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e4dfb555e25764a861ce6228c6a805, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speedNormal: 16
-  friction: 0.99
+  upCode: 7a0000001101000077000000
+  downCode: 7300000012010000
+  leftCode: 710000001401000061000000
+  rightCode: 6400000013010000
+  speedNormal: 5
+  friction: 0.97
   camFocus: {fileID: 1618604945}
   ecart: 0.5
   camFocusDelay: 1
+  influenceurList: []
+  maximalInfluence: 0.9
 --- !u!1 &1523369300
 GameObject:
   m_ObjectHideFlags: 0
