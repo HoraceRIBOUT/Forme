@@ -2,12 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InterestPoint : MonoBehaviour
-{
-    public float interest = 1;
-
-}
-
 public class CameraManager : MonoBehaviour
 {
     public float ZVal;
