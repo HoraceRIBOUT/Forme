@@ -14,13 +14,13 @@ public class PNJ : InterestPoint
     private Vector2 seed = new Vector2(1,1);
     public float randomSeedSpeed = 0.1f;
 
-    private void Start()
+    protected void Start()
     {
         seed = new Vector2(Random.Range(0f, 200f), Random.Range(0f, 200f));
     }
 
     // Update is called once per frame
-    void Update()
+    protected void Update()
     {
 
         SpeedManagement();

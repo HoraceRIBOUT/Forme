@@ -50,7 +50,7 @@ public class CameraManager : MonoBehaviour
                 if (value01 < 0 || value01 > 1) Debug.Log("Value01 wrong " + value01);
                 //else Debug.Log("Value01 good but... " + value01);
                 sumInterest += point.interest * value01;
-                sumPos += point.transform.position * value01;
+                sumPos += point.transform.position * point.interest * value01;
             }
         }
         currentTarget = sumPos / sumInterest;
