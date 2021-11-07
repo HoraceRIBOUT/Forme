@@ -2,8 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteAlways]
 public class Player : MonoBehaviour
 {
+    [Header("instance")]
+    public static Player _pl;
     [Header("Input")]
     public List<KeyCode> upCode;
     public List<KeyCode> downCode;
@@ -18,7 +21,10 @@ public class Player : MonoBehaviour
     public float friction = 0.9f;
 
     public Transform camFocus;
+    public Transform leftFoot;
+    public Transform rightFoot;
     public float ecart = 0.5f;
+    public float footEcart = 0.5f;
     public float camFocusDelay = 0.5f;
     private Vector2 lastDirection = Vector2.zero;
     private Vector2 targetDirection = Vector2.zero;
@@ -28,9 +34,18 @@ public class Player : MonoBehaviour
     public float maximalInfluence = 0.9f;
     public float howLongToLooseAllBuilt = 20f;
 
+    [Header("Mur")]
+    public List<Mur> murList = new List<Mur>();
+
+    [Header("Step")]
+    public GameObject step;
+    public float distanceBetweenStep = 0.1f;
+
     // Start is called before the first frame update
     void Start()
     {
+        _pl = this;
+
         influenceurList = new List<Influenceur>();
         foreach (Influenceur influenceur in FindObjectsOfType<Influenceur>())
         {
@@ -43,10 +58,18 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+#if UNITY_EDITOR
+        if (Application.isPlaying)
+#endif
         MovementManagement();
+
         VisualManagement();
 
-        _Debug();
+
+#if UNITY_EDITOR
+        if (Application.isPlaying)
+#endif
+            _Debug();
     }
 
     [Header("Visual")]
@@ -73,7 +96,9 @@ public class Player : MonoBehaviour
         //_sR.transform.rotation = Quaternion.Euler(0, 0, );
     }
 
-    public float goHome = 0; 
+    public float goHome = 0;
+    public Vector3 lastStepPos = Vector3.zero;
+    private bool leftLeftLeft = false;
     public void MovementManagement()
     {
         if (Input.GetKey(KeyCode.Space))
@@ -108,6 +133,7 @@ public class Player : MonoBehaviour
         }
 
         direction = InfluenceurZone(direction);
+        direction = InfluenceurMur(direction);
 
 
         Vector2 finalSpeed = direction.normalized * currentSpeedMax;
@@ -123,7 +149,19 @@ public class Player : MonoBehaviour
 
         lastDirection = Vector2.Lerp(lastDirection, targetDirection, Time.deltaTime * camFocusDelay);
         camFocus.position = this.transform.position + (Vector3)lastDirection * ecart;
+
         //        camFocus.position = Vector3.Lerp(camFocus.position, this.transform.position + (Vector3)lastDirection * ecart, Time.deltaTime * camFocusDelay);
+
+        leftFoot.position = this.transform.position + Vector3.Cross(lastDirection, Vector3.forward) * footEcart;
+        rightFoot.position = this.transform.position + -Vector3.Cross(lastDirection, Vector3.forward) * footEcart;
+
+        Vector3 dirdir = (lastStepPos - (leftLeftLeft ? leftFoot.position : rightFoot.position));
+        if (dirdir.magnitude > distanceBetweenStep)
+        {
+            lastStepPos = leftFoot.position;
+            Instantiate(step, leftLeftLeft ? leftFoot.position : rightFoot.position, Quaternion.identity, null);
+            leftLeftLeft = !leftLeftLeft;
+        }
     }
 
 
@@ -176,6 +214,25 @@ public class Player : MonoBehaviour
         if (influenceurList.Count == 0 || !atLeastOne)
             currentSpeedMax = Mathf.Lerp(currentSpeedMax, speedNormal, Time.deltaTime / howLongToLooseAllBuilt);
 
+        return direction;
+    }
+
+    public float murDist = 4;
+    public Vector2 InfluenceurMur(Vector2 direction)
+    {
+        foreach(Mur mur in murList)
+        {
+            Vector3 murDirection = mur.transform.right;
+            Vector3 towardWall = (this.transform.position - mur.transform.position);
+            if (Vector3.Dot(mur.transform.right, towardWall) < 0)
+            {
+                murDirection = -mur.transform.right;
+            }
+            Debug.DrawRay(this.transform.position, murDirection, Color.red + Color.green);
+            float value01 = towardWall.magnitude / murDist;
+            value01 = 1 - Mathf.Clamp01(value01);
+            direction = Vector2.Lerp(direction, murDirection, value01);
+        }
         return direction;
     }
 

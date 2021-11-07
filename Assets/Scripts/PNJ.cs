@@ -5,6 +5,8 @@ using UnityEngine;
 public class PNJ : InterestPoint
 {
     public List<Influenceur> influenceurAutour;
+    [Range(0,1)]
+    public float influenceMax = 0.5f;
     //Pour l'instant : s'en foutent de si y a des PNJ
 
     public float speedNormal = 1;
@@ -13,18 +15,25 @@ public class PNJ : InterestPoint
 
     private Vector2 seed = new Vector2(1,1);
     public float randomSeedSpeed = 0.1f;
+    [Header("Visual")]
+    public SpriteRenderer _sR;
 
     protected void Start()
     {
         seed = new Vector2(Random.Range(0f, 200f), Random.Range(0f, 200f));
+
+        if(this.GetComponent<Influenceur>() == null)
+        {
+            speedNormal = Random.Range(1f,5f);
+            
+            _sR.color = Player._pl.gradientSpeed.Evaluate(speedNormal / Player._pl.maxSpeed);
+        }
     }
 
     // Update is called once per frame
     protected void Update()
     {
-
         SpeedManagement();
-
     }
 
     void SpeedManagement()
@@ -63,10 +72,11 @@ public class PNJ : InterestPoint
                     Debug.DrawRay(this.transform.position, directionToHim * valRepuls01, Color.black);
                     //Debug.Log("ValRepuls :" + valRepuls01);
                     direction = Vector2.Lerp(direction, -directionToHim, valRepuls01);
+
                 }
                 else
                 {
-                    direction = Vector2.Lerp(direction, directionToHim * infl.attractivenessForPNJ, valAttract01 * 0.5f);
+                    direction = Vector2.Lerp(direction, directionToHim * infl.attractivenessForPNJ, valAttract01 * influenceMax);
                 }
             }
 
